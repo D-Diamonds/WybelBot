@@ -14,7 +14,7 @@ public class BotRunner extends ListenerAdapter {
 
 	private static TicTacToeUpdater ticTacToeUpdater = new TicTacToeUpdater();
 	private static StatUpdater statUpdater = new StatUpdater();
-	private static final String botName = "Mehme";
+	private static final String botName = "Wybel";
 	private static XPQueue xpQueue = new XPQueue();
 
 
