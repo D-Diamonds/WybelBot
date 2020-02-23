@@ -49,6 +49,7 @@ public class StatUpdater extends Updater {
 			createUserStat(author);
 		userStats = getUserStats(author);
 
+		userStats.addXP("message");
 		if (messagePhrases[0].equals(moduleCommand)) {
 			// help
 			if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
@@ -62,6 +63,7 @@ public class StatUpdater extends Updater {
 				channel.sendMessage(userStats.toEmbed()).queue();
 			}
 		}
+		dataSaver.queueSaving();
 	}
 
 	public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
