@@ -69,7 +69,7 @@ public class StatUpdater extends Updater {
 				// help
 				if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
 					EmbedBuilder eb = new EmbedBuilder();
-					eb.setTitle(BotRunner.getBotName() + " Instruction:");
+					eb.setTitle(moduleName + " Commands:");
 					eb.setColor(new Color(80, 255, 236));
 					eb.addField("**Get user stats**", moduleCommand + " get", false);
 					channel.sendMessage(eb.build()).queue();

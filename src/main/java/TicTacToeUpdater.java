@@ -65,7 +65,7 @@ public class TicTacToeUpdater extends Updater {
 		// help
 		if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
 			EmbedBuilder eb = new EmbedBuilder();
-			eb.setTitle(BotRunner.getBotName() + " Instruction:");
+			eb.setTitle(moduleName + " Commands:");
 			eb.setColor(new Color(80, 255, 236));
 			eb.addField("**Start a game**", moduleCommand + " start", false);
 			eb.addField("**Make a move**", moduleCommand + " move [#]", false);
