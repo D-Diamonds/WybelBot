@@ -13,6 +13,9 @@ import java.util.List;
 public class BotRunner extends ListenerAdapter {
 
 	private static TicTacToeUpdater ticTacToeUpdater = new TicTacToeUpdater();
+	private static StatUpdater statUpdater = new StatUpdater();
+	private static final String botName = "Wybel";
+
 
 	public static void main(String[] args) throws LoginException {
 		// builds discord interaction
@@ -20,6 +23,11 @@ public class BotRunner extends ListenerAdapter {
 		builder.addEventListeners(new BotRunner());
 		builder.build();
 		System.out.println();
+
+	}
+
+	public static String getBotName() {
+		return botName;
 	}
 
 	@Override
@@ -32,15 +40,17 @@ public class BotRunner extends ListenerAdapter {
 			// help command
 			if (messagePhrases[0].equals("!help")) {
 				EmbedBuilder eb = new EmbedBuilder();
-				eb.setTitle("Mehme Modules:");
+				eb.setTitle(botName + " Modules:");
 				eb.setColor(new Color(0, 0, 255));
 				eb.addField("**List help modules**", "!help", false);
-				eb.addField("**List TicTacToe commands**", "!ttt help", false);
+				eb.addField("**List " + TicTacToeUpdater.getModuleName() + " commands**", TicTacToeUpdater.getModuleCommand() + " help", false);
 				channel.sendMessage(eb.build()).queue();
 			}
 			// tictactoe commands
-			else if (messagePhrases[0].equals("!ttt"))
+			else if (messagePhrases[0].equals(TicTacToeUpdater.getModuleCommand()))
 				ticTacToeUpdater.onMessageReceived(event);
+			// stat commands/events
+			statUpdater.onMessageReceived(event);
 		}
 	}
 
@@ -56,5 +66,6 @@ public class BotRunner extends ListenerAdapter {
 			System.out.println("Adding role Tyro to " + member.getEffectiveName());
 			guild.addRoleToMember(member, roles.get(0)).complete();
 		}
+		statUpdater.onGuildMemberJoin(event);
 	}
 }

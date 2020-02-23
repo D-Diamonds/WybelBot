@@ -5,79 +5,29 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-public class TicTacToeUpdater {
+public class TicTacToeUpdater extends Updater {
 
 	private ArrayList<TicTacToe> tttGames;
-	private ScheduledExecutorService scheduledExecutorService;
-	private boolean saving;
+
+	public DataSaver dataSaver;
+
+	private static final String moduleName = "TicTacToe";
+	private static final String moduleCommand = "!ttt";
+	private static final String moduleDataPath = "src/" + BotRunner.getBotName() + "Data" + moduleName;
 
 	public TicTacToeUpdater() {
-		onStart();
-		startSaving();
+		createDataSaver();
 	}
 
-	// loads all ongoing tictactoe games
-	@SuppressWarnings("unchecked")
-	private void onStart() {
-		try {
-			System.out.println("\nNow loading bot data...");
-			File srcFolder = new File("src");
-			if (!srcFolder.exists()) {
-				srcFolder.mkdir();
-			}
-			File dataFile = new File("src/MehmeData");
-			if (!dataFile.exists()) {
-				dataFile.createNewFile();
-				FileOutputStream fileOutputStream = new FileOutputStream("src/MehmeData");
-				ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-				objectOutputStream.writeObject(new ArrayList<TicTacToe>());
-				objectOutputStream.close();
-				fileOutputStream.close();
-			}
-			FileInputStream fileInputStream = new FileInputStream("src/MehmeData");
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			System.out.println("MAde it to here");
-			tttGames = (ArrayList<TicTacToe>) objectInputStream.readObject();
-			if (tttGames == null)
-				tttGames = new ArrayList<>();
-			System.out.println("Loaded " + tttGames.size() + " TicTacToe games");
-			System.out.println("Completed loading bot data!\n");
-		}
-		catch (IOException | ClassNotFoundException e) {
-			System.out.println(e.toString());
-		}
+	public static String getModuleCommand() {
+		return moduleCommand;
 	}
 
-	// enables the serialization and saving process that runs every 30 seconds
-	private void startSaving() {
-		scheduledExecutorService = Executors.newScheduledThreadPool (1);
-		Runnable saveDataRunnable = () -> {
-			try {
-				if (saving) {
-					System.out.println("\nNow saving bot data...");
-					FileOutputStream fileOutputStream = new FileOutputStream("src/MehmeData");
-					ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-					objectOutputStream.writeObject(tttGames);
-					System.out.println("Saved " + tttGames.size() + " TicTacToe games");
-					objectOutputStream.close();
-					fileOutputStream.close();
-					System.out.println("Completed saving bot data!\n");
-					unqueueSaving();
-				}
-
-			} catch (IOException e) {
-				System.out.println(e.toString());
-			}
-		};
-		scheduledExecutorService.scheduleAtFixedRate(saveDataRunnable, 10, 30, TimeUnit.SECONDS);
-
+	public static String getModuleName() {
+		return moduleName;
 	}
 
 	// finds player's board from list of ongoing games
@@ -95,23 +45,11 @@ public class TicTacToeUpdater {
 		for (int i = 0; i < tttGames.size(); i++) {
 			if (tttGames.get(i).getPlayerID().equals(user.getId())) {
 				tttGames.remove(i);
-				queueSaving();
+				dataSaver.queueSaving();
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private void queueSaving() {
-		if (!saving) {
-			saving = true;
-			System.out.println("Saving queued");
-		}
-	}
-
-	private void unqueueSaving() {
-		saving = false;
-		System.out.println("Saving unqueued");
 	}
 
 	// tictactoe message commands
@@ -127,11 +65,11 @@ public class TicTacToeUpdater {
 		// help
 		if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
 			EmbedBuilder eb = new EmbedBuilder();
-			eb.setTitle("Mehme TicTacToe Instruction:");
+			eb.setTitle(BotRunner.getBotName() + " Instruction:");
 			eb.setColor(new Color(80, 255, 236));
-			eb.addField("**Start a game**", "!ttt start", false);
-			eb.addField("**Make a move**", "!ttt move [#]", false);
-			eb.addField("**Get game board**", "!ttt get", false);
+			eb.addField("**Start a game**", moduleCommand + " start", false);
+			eb.addField("**Make a move**", moduleCommand + " move [#]", false);
+			eb.addField("**Get game board**", moduleCommand + " get", false);
 			channel.sendMessage(eb.build()).queue();
 		}
 		// start
@@ -139,65 +77,63 @@ public class TicTacToeUpdater {
 			if (board == null) {
 				channel.sendMessage("Creating game for <@" + author.getId() + ">").queue();
 				tttGames.add(board = new TicTacToe(author));
-				queueSaving();
+				dataSaver.queueSaving();
 			}
 			else
 				channel.sendMessage("Game already created for <@" + author.getId() + ">").queue();
 			channel.sendMessage(board.toEmbed()).queue();
 		}
-		// move
-		else if (messagePhrases.length >= 3 && messagePhrases[1].equals("move")) {
-			if (board == null)
-				channel.sendMessage("No board found for <@" + author.getId() + ">. Create one with the command \"!ttt start\"").queue();
-			else if (!board.movesLeft()) {
-				channel.sendMessage("No moves remaining in <@" + author.getId() + ">'s TicTacToe game").queue();
-				removePlayerBoard(author);
-			}
-			else if (board.playMove(messagePhrases[2].toLowerCase())) {
-				if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":x:")) {
-					channel.sendMessage(board.toEmbed()).queue();
-					channel.sendMessage("<@" + author.getId() + "> has won TicTacToe!").queue();
+		else if (board != null) {
+			// move
+			if (messagePhrases.length >= 3 && messagePhrases[1].equals("move")) {
+				if (!board.movesLeft()) {
+					channel.sendMessage("No moves remaining in <@" + author.getId() + ">'s " + moduleName + " game").queue();
 					removePlayerBoard(author);
 				}
-				else if (!board.movesLeft()) {
-					channel.sendMessage(board.toEmbed()).queue();
-					channel.sendMessage("<@" + author.getId() + ">'s TicTacToe game ended in a tie!").queue();
-					removePlayerBoard(author);
-				}
-				else {
-					board.moveAI();
-					if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":o:")) {
+				else if (board.playMove(messagePhrases[2].toLowerCase())) {
+					if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":x:")) {
 						channel.sendMessage(board.toEmbed()).queue();
-						channel.sendMessage( "Mehme has won TicTacToe against <@" + author.getId() + ">").queue();
+						channel.sendMessage("<@" + author.getId() + "> has won " + moduleName + "!").queue();
 						removePlayerBoard(author);
 					}
 					else if (!board.movesLeft()) {
 						channel.sendMessage(board.toEmbed()).queue();
-						channel.sendMessage("<@" + author.getId() + ">'s TicTacToe game ended in a tie!").queue();
+						channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!").queue();
 						removePlayerBoard(author);
 					}
 					else {
-						queueSaving();
-						channel.sendMessage(board.toEmbed()).queue();
+						board.moveAI();
+						if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":o:")) {
+							channel.sendMessage(board.toEmbed()).queue();
+							channel.sendMessage(BotRunner.getBotName() + " has won " + moduleName + " against <@" + author.getId() + ">").queue();
+							removePlayerBoard(author);
+						}
+						else if (!board.movesLeft()) {
+							channel.sendMessage(board.toEmbed()).queue();
+							channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!").queue();
+							removePlayerBoard(author);
+						}
+						else {
+							dataSaver.queueSaving();
+							channel.sendMessage(board.toEmbed()).queue();
+						}
 					}
 				}
+				else
+					channel.sendMessage("<@" + author.getId() + "> Invalid syntax or move. Command syntax: \"" + moduleCommand + " move [number]\"").queue();
 			}
-			else
-				channel.sendMessage("<@" + author.getId() + "> Invalid syntax or move. Command syntax: \"!ttt move [number]\"").queue();
-		}
-		// get
-		else if (messagePhrases.length >= 2 && messagePhrases[1].equals("get")) {
-			if (board == null)
-				channel.sendMessage("No board found for <@" + author.getId() + ">. Create one with the command \"!ttt start\"").queue();
-			else {
+			// get
+			else if (messagePhrases.length >= 2 && messagePhrases[1].equals("get")) {
 				channel.sendMessage(board.toEmbed()).queue();
 			}
+			// end
+			else if (messagePhrases.length >= 2 && messagePhrases[1].equals("end")) {
+				removePlayerBoard(author);
+				channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game has ended").queue();
+			}
 		}
-		// end
-		else if (messagePhrases.length >= 2 && messagePhrases[1].equals("end")) {
-			removePlayerBoard(author);
-			channel.sendMessage("<@" + author.getId() + ">'s TicTacToe game has ended").queue();
-		}
+		else
+			channel.sendMessage("No board found for <@" + author.getId() + ">. Create one with the command \"" + moduleCommand + " start\"").queue();
 
 		// admin commands
 
@@ -206,17 +142,17 @@ public class TicTacToeUpdater {
 			if (messagePhrases.length >= 3 && messagePhrases[1].equals("remove")) {
 				List<Member> taggedMembers;
 				if (messagePhrases[2].equals("all")) {
-					System.out.println("Removing all TicTacToe games");
-					channel.sendMessage("All TicTacToe games have been removed").queue();
+					System.out.println("Removing all " + moduleName + " games");
+					channel.sendMessage("All " + moduleName + " games have been removed").queue();
 					tttGames = new ArrayList<>();
-					queueSaving();
+					dataSaver.queueSaving();
 				}
 				else {
 					taggedMembers = event.getMessage().getMentionedMembers();
 					for (Member member : taggedMembers) {
 						if (removePlayerBoard(member.getUser())) {
-							System.out.println("Removing " + member.getEffectiveName() + "'s TicTacToe game");
-							channel.sendMessage("<@" + member.getIdLong() + ">'s TicTacToe game has been removed").queue();
+							System.out.println("Removing " + member.getEffectiveName() + "'s " + moduleName + " game");
+							channel.sendMessage("<@" + member.getIdLong() + ">'s " + moduleName + " game has been removed").queue();
 						}
 						else
 							channel.sendMessage("No board found for <@" + member.getIdLong() + ">").queue();
@@ -228,14 +164,30 @@ public class TicTacToeUpdater {
 				if (messagePhrases[2].equals("disable")) {
 					System.out.println("Saving disabled");
 					channel.sendMessage("Saving disabled").queue();
-					scheduledExecutorService.shutdown();
+					dataSaver.disableSaving();
 				}
 				else if (messagePhrases[2].equals("enable")) {
 					System.out.println("Saving enabled");
 					channel.sendMessage("Saving enabled").queue();
-					startSaving();
+					enableSaving();
 				}
 			}
 		}
+	}
+
+	// creates DataSaver
+	public void createDataSaver() {
+		tttGames = new ArrayList<>();
+		dataSaver = new DataSaver(moduleName, moduleDataPath, tttGames);
+		tttGames = (ArrayList<TicTacToe>) dataSaver.onStart();
+		if (tttGames == null)
+			tttGames = new ArrayList<>();
+		System.out.println("Loaded " + tttGames.size() + " " + moduleName +  " games");
+	}
+
+	// enables dataSaver saving
+	public void enableSaving() {
+		dataSaver.enableSaving();
+		System.out.println("Saved " + tttGames.size() + " " + moduleName + " games");
 	}
 }
