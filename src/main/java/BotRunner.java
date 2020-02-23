@@ -49,6 +49,7 @@ public class BotRunner extends ListenerAdapter {
 				eb.setColor(new Color(0, 0, 255));
 				eb.addField("**List help modules**", "!help", false);
 				eb.addField("**List " + TicTacToeUpdater.getModuleName() + " commands**", TicTacToeUpdater.getModuleCommand() + " help", false);
+				eb.addField("**List " + StatUpdater.getModuleName() + " commands**", TicTacToeUpdater.getModuleCommand() + " help", false);
 				channel.sendMessage(eb.build()).queue();
 			}
 			// tictactoe commands

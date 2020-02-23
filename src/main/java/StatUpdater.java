@@ -64,6 +64,7 @@ public class StatUpdater extends Updater {
 			userStats = getUserStats(author);
 
 			userStats.addXP("message");
+
 			if (messagePhrases[0].equals(moduleCommand)) {
 				// help
 				if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
