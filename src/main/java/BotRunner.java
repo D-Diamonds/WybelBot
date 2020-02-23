@@ -15,6 +15,7 @@ public class BotRunner extends ListenerAdapter {
 	private static TicTacToeUpdater ticTacToeUpdater = new TicTacToeUpdater();
 	private static StatUpdater statUpdater = new StatUpdater();
 	private static final String botName = "Wybel";
+	private static XPQueue xpQueue = new XPQueue();
 
 
 	public static void main(String[] args) throws LoginException {
@@ -28,6 +29,10 @@ public class BotRunner extends ListenerAdapter {
 
 	public static String getBotName() {
 		return botName;
+	}
+
+	public static XPQueue getXpQueue() {
+		return xpQueue;
 	}
 
 	@Override
@@ -52,6 +57,8 @@ public class BotRunner extends ListenerAdapter {
 			// stat commands/events
 			statUpdater.onMessageReceived(event);
 		}
+		statUpdater.setXpQueue(xpQueue.getXpQueue());
+		xpQueue.clearQueue();
 	}
 
 	@Override

@@ -14,6 +14,9 @@ public class TicTacToe implements Serializable {
 	private int moveRow;
 	private int moveCol;
 
+	private boolean gameOver;
+	private String gameResult;
+
 	private ArrayList<Integer> possibleMoves;
 
 	private static final String[] NUM_TO_EMOJI = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:"};
@@ -23,6 +26,8 @@ public class TicTacToe implements Serializable {
 		playerID = user.getId();
 		board = new String[3][3];
 		possibleMoves = new ArrayList<>();
+		gameOver = false;
+		gameResult = "";
 
 		for (int i = 0; i < 9; i++)
 			possibleMoves.add(i);
@@ -61,7 +66,12 @@ public class TicTacToe implements Serializable {
 
 	// returns if moves left on board
 	public boolean movesLeft() {
-		return possibleMoves.size() != 0;
+		if (possibleMoves.size() != 0)
+			return true;
+		else {
+			gameOver = true;
+			return false;
+		}
 	}
 
 	// plays the user's move
@@ -101,6 +111,10 @@ public class TicTacToe implements Serializable {
 		moveCol = col;
 		board[moveRow][moveCol] = symbol;
 		possibleMoves.remove(index);
+	}
+
+	public void setGameResult(String gameResult) {
+		this.gameResult = gameResult;
 	}
 
 	// attempts a move in row/col for win
@@ -207,23 +221,29 @@ public class TicTacToe implements Serializable {
 		for (int i = 0; i < board.length; i++) {
 			if (!board[i][col].equals(symbol))
 				break;
-			else if (i == board.length - 1)
+			else if (i == board.length - 1) {
+				gameOver = true;
 				return true;
+			}
 		}
 		// row win
 		for (int i = 0; i < board.length; i++) {
 			if (!board[row][i].equals(symbol))
 				break;
-			else if (i == board.length - 1)
+			else if (i == board.length - 1) {
+				gameOver = true;
 				return true;
+			}
 		}
 		// diag win
 		if (row == col) {
 			for (int i = 0; i < board.length; i++) {
 				if (!board[i][i].equals(symbol))
 					break;
-				else if (i == board.length - 1)
+				else if (i == board.length - 1) {
+					gameOver = true;
 					return true;
+				}
 			}
 		}
 		// other diag win
@@ -231,8 +251,10 @@ public class TicTacToe implements Serializable {
 			for (int i = 0; i < board.length; i++) {
 				if (!board[i][board.length - 1 - i].equals(symbol))
 					break;
-				else if (i == board.length - 1)
+				else if (i == board.length - 1) {
+					gameOver = true;
 					return true;
+				}
 			}
 		}
 		return false;
@@ -256,7 +278,9 @@ public class TicTacToe implements Serializable {
 		eb.addField("", boardString.toString(), true);
 		eb.addBlankField(true);
 		eb.addField("", ":x: " + playerName + "\n:o: " + BotRunner.getBotName(), true);
-
+		if (gameOver)
+			eb.addField("XP", "+" + UserStats.getXpValues().get(gameResult), false);
+		System.out.println(gameOver);
 		return eb.build();
 	}
 }

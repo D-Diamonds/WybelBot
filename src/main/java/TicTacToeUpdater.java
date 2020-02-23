@@ -92,11 +92,15 @@ public class TicTacToeUpdater extends Updater {
 				}
 				else if (board.playMove(messagePhrases[2].toLowerCase())) {
 					if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":x:")) {
+						BotRunner.getXpQueue().addToQueue(author, "ttt_win");
+						board.setGameResult("ttt_win");
 						channel.sendMessage(board.toEmbed()).queue();
 						channel.sendMessage("<@" + author.getId() + "> has won " + moduleName + "!").queue();
 						removePlayerBoard(author);
 					}
 					else if (!board.movesLeft()) {
+						BotRunner.getXpQueue().addToQueue(author, "ttt_tie");
+						board.setGameResult("ttt_tie");
 						channel.sendMessage(board.toEmbed()).queue();
 						channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!").queue();
 						removePlayerBoard(author);
@@ -104,11 +108,15 @@ public class TicTacToeUpdater extends Updater {
 					else {
 						board.moveAI();
 						if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":o:")) {
+							BotRunner.getXpQueue().addToQueue(author, "ttt_loss");
+							board.setGameResult("ttt_loss");
 							channel.sendMessage(board.toEmbed()).queue();
 							channel.sendMessage(BotRunner.getBotName() + " has won " + moduleName + " against <@" + author.getId() + ">").queue();
 							removePlayerBoard(author);
 						}
 						else if (!board.movesLeft()) {
+							BotRunner.getXpQueue().addToQueue(author, "ttt_tie");
+							board.setGameResult("ttt_tie");
 							channel.sendMessage(board.toEmbed()).queue();
 							channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!").queue();
 							removePlayerBoard(author);
