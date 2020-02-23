@@ -37,7 +37,7 @@ public class BotRunner extends ListenerAdapter {
 
 	@Override
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-		MessageChannel channel = event.getChannel();
+//		MessageChannel channel = event.getChannel();
 		Message message = event.getMessage();
 		String[] messagePhrases = message.getContentDisplay().toLowerCase().split(" ");
 
@@ -50,7 +50,7 @@ public class BotRunner extends ListenerAdapter {
 				eb.addField("**List help modules**", "!help", false);
 				eb.addField("**List " + TicTacToeUpdater.getModuleName() + " commands**", TicTacToeUpdater.getModuleCommand() + " help", false);
 				eb.addField("**List " + StatUpdater.getModuleName() + " commands**", StatUpdater.getModuleCommand() + " help", false);
-				channel.sendMessage(eb.build()).queue();
+				MessageSender.sendMessage(event, eb.build());
 			}
 			// tictactoe commands
 			else if (messagePhrases[0].equals(TicTacToeUpdater.getModuleCommand()))

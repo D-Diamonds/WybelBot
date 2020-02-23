@@ -1,7 +1,7 @@
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class XPQueue {
@@ -17,7 +17,7 @@ public class XPQueue {
 			userQueue.add(type);
 		}
 		else
-			xpQueue.put(user, new ArrayList<>(Arrays.asList(type)));
+			xpQueue.put(user, new ArrayList<>(Collections.singletonList(type)));
 	}
 
 	public HashMap<User, ArrayList<String>> getXpQueue() {

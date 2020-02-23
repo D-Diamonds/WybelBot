@@ -1,8 +1,8 @@
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public abstract class Updater {
+public abstract class Updater<Object> {
 
-	public DataSaver dataSaver;
+	public DataSaver<Object> dataSaver;
 
 	public abstract void createDataSaver();
 	public abstract void enableSaving();

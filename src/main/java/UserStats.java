@@ -11,12 +11,10 @@ import java.util.Map;
 public class UserStats implements Serializable {
 
 	private String playerName;
-	private String playerID;
 
 	// base leveling
 	private int level;
 	private int xp;
-	private int levelXP;
 
 	// ttt stats
 	private int tttWins;
@@ -41,7 +39,6 @@ public class UserStats implements Serializable {
 
 	public UserStats(User user) {
 		playerName = user.getName();
-		playerID = user.getId();
 		reset();
 	}
 
@@ -51,12 +48,11 @@ public class UserStats implements Serializable {
 		tttLosses = 0;
 		level = 1;
 		xp = 0;
-		levelXP = getLevelXP();
 		leveledUp = false;
 	}
 
 	private int getLevelXP() {
-		return (int) Math.ceil((4*(Math.pow(level, 3))) / 5.0);
+		return (int) Math.ceil(.1*Math.pow(level, 2) + 5*level);
 	}
 
 	public int getLevel() {
@@ -64,14 +60,18 @@ public class UserStats implements Serializable {
 	}
 
 	public void incrementStats(String type) {
-		if (type.equals("ttt_win"))
-			tttWins++;
-		else if (type.equals("ttt_tie"))
-			tttTies++;
-		else if (type.equals("ttt_loss"))
-			tttLosses++;
+		switch (type) {
+			case "ttt_win":
+				tttWins++;
+				break;
+			case "ttt_tie":
+				tttTies++;
+				break;
+			case "ttt_loss":
+				tttLosses++;
+				break;
+		}
 		addXP(type);
-
 	}
 
 	public void addXP(String type) {
@@ -93,14 +93,13 @@ public class UserStats implements Serializable {
 	}
 
 	private void levelUp() {
-		xp = xp % levelXP;
+		xp = xp % getLevelXP();
 		level++;
-		levelXP = getLevelXP();
 		leveledUp = true;
 	}
 
 	private boolean checkLvlUp() {
-		return xp >= levelXP;
+		return xp >= getLevelXP();
 	}
 
 	// returns formatted board for discord output
@@ -110,8 +109,8 @@ public class UserStats implements Serializable {
 		eb.setColor(new Color(25, 255, 133));
 
 		eb.addField("Level:", Integer.toString(level), false);
-		eb.addField("XP:", Integer.toString(xp) + "/" + Integer.toString(levelXP), false);
-		eb.addField(TicTacToeUpdater.getModuleName() + " W | L | T:", Integer.toString(tttWins) + " | " + Integer.toString(tttLosses) + " | " + Integer.toString(tttTies), false);
+		eb.addField("XP:", xp + "/" + getLevelXP(), false);
+		eb.addField(TicTacToeUpdater.getModuleName() + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
 
 		return eb.build();
 	}

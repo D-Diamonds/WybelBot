@@ -280,7 +280,6 @@ public class TicTacToe implements Serializable {
 		eb.addField("", ":x: " + playerName + "\n:o: " + BotRunner.getBotName(), true);
 		if (gameOver)
 			eb.addField("XP", "+" + UserStats.getXpValues().get(gameResult), false);
-		System.out.println(gameOver);
 		return eb.build();
 	}
 }

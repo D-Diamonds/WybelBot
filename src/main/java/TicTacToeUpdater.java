@@ -1,6 +1,5 @@
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -8,11 +7,9 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TicTacToeUpdater extends Updater {
+public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 
 	private ArrayList<TicTacToe> tttGames;
-
-	public DataSaver dataSaver;
 
 	private static final String moduleName = "TicTacToe";
 	private static final String moduleCommand = "!ttt";
@@ -54,7 +51,7 @@ public class TicTacToeUpdater extends Updater {
 
 	// tictactoe message commands
 	public void onMessageReceived(MessageReceivedEvent event) {
-		MessageChannel channel = event.getChannel();
+		//MessageChannel channel = event.getChannel();
 		User author = event.getAuthor();
 		String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
 
@@ -70,39 +67,39 @@ public class TicTacToeUpdater extends Updater {
 			eb.addField("**Start a game**", moduleCommand + " start", false);
 			eb.addField("**Make a move**", moduleCommand + " move [#]", false);
 			eb.addField("**Get game board**", moduleCommand + " get", false);
-			channel.sendMessage(eb.build()).queue();
+			MessageSender.sendMessage(event, eb.build());
 		}
 		// start
 		else if (messagePhrases.length >= 2 && messagePhrases[1].equals("start")) {
 			if (board == null) {
-				channel.sendMessage("Creating game for <@" + author.getId() + ">").queue();
+				MessageSender.sendMessage(event, "Creating game for <@" + author.getId() + ">");
 				tttGames.add(board = new TicTacToe(author));
 				dataSaver.queueSaving();
 			}
 			else
-				channel.sendMessage("Game already created for <@" + author.getId() + ">").queue();
-			channel.sendMessage(board.toEmbed()).queue();
+				MessageSender.sendMessage(event, "Game already created for <@" + author.getId() + ">");
+			MessageSender.sendMessage(event, board.toEmbed());
 		}
 		else if (board != null) {
 			// move
 			if (messagePhrases.length >= 3 && messagePhrases[1].equals("move")) {
 				if (!board.movesLeft()) {
-					channel.sendMessage("No moves remaining in <@" + author.getId() + ">'s " + moduleName + " game").queue();
+					MessageSender.sendMessage(event, "No moves remaining in <@" + author.getId() + ">'s " + moduleName + " game");
 					removePlayerBoard(author);
 				}
 				else if (board.playMove(messagePhrases[2].toLowerCase())) {
 					if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":x:")) {
 						BotRunner.getXpQueue().addToQueue(author, "ttt_win");
 						board.setGameResult("ttt_win");
-						channel.sendMessage(board.toEmbed()).queue();
-						channel.sendMessage("<@" + author.getId() + "> has won " + moduleName + "!").queue();
+						MessageSender.sendMessage(event, board.toEmbed());
+						MessageSender.sendMessage(event, "<@" + author.getId() + "> has won " + moduleName + "!");
 						removePlayerBoard(author);
 					}
 					else if (!board.movesLeft()) {
 						BotRunner.getXpQueue().addToQueue(author, "ttt_tie");
 						board.setGameResult("ttt_tie");
-						channel.sendMessage(board.toEmbed()).queue();
-						channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!").queue();
+						MessageSender.sendMessage(event, board.toEmbed());
+						MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!");
 						removePlayerBoard(author);
 					}
 					else {
@@ -110,38 +107,38 @@ public class TicTacToeUpdater extends Updater {
 						if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":o:")) {
 							BotRunner.getXpQueue().addToQueue(author, "ttt_loss");
 							board.setGameResult("ttt_loss");
-							channel.sendMessage(board.toEmbed()).queue();
-							channel.sendMessage(BotRunner.getBotName() + " has won " + moduleName + " against <@" + author.getId() + ">").queue();
+							MessageSender.sendMessage(event, board.toEmbed());
+							MessageSender.sendMessage(event, BotRunner.getBotName() + " has won " + moduleName + " against <@" + author.getId() + ">");
 							removePlayerBoard(author);
 						}
 						else if (!board.movesLeft()) {
 							BotRunner.getXpQueue().addToQueue(author, "ttt_tie");
 							board.setGameResult("ttt_tie");
-							channel.sendMessage(board.toEmbed()).queue();
-							channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!").queue();
+							MessageSender.sendMessage(event, board.toEmbed());
+							MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!");
 							removePlayerBoard(author);
 						}
 						else {
 							dataSaver.queueSaving();
-							channel.sendMessage(board.toEmbed()).queue();
+							MessageSender.sendMessage(event, board.toEmbed());
 						}
 					}
 				}
 				else
-					channel.sendMessage("<@" + author.getId() + "> Invalid syntax or move. Command syntax: \"" + moduleCommand + " move [number]\"").queue();
+					MessageSender.sendMessage(event, "<@" + author.getId() + "> Invalid syntax or move. Command syntax: \"" + moduleCommand + " move [number]\"");
 			}
 			// get
 			else if (messagePhrases.length >= 2 && messagePhrases[1].equals("get")) {
-				channel.sendMessage(board.toEmbed()).queue();
+				MessageSender.sendMessage(event, board.toEmbed());
 			}
 			// end
 			else if (messagePhrases.length >= 2 && messagePhrases[1].equals("end")) {
 				removePlayerBoard(author);
-				channel.sendMessage("<@" + author.getId() + ">'s " + moduleName + " game has ended").queue();
+				MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game has ended");
 			}
 		}
 		else
-			channel.sendMessage("No board found for <@" + author.getId() + ">. Create one with the command \"" + moduleCommand + " start\"").queue();
+			MessageSender.sendMessage(event, "No board found for <@" + author.getId() + ">. Create one with the command \"" + moduleCommand + " start\"");
 
 		// admin commands
 
@@ -151,7 +148,7 @@ public class TicTacToeUpdater extends Updater {
 				List<Member> taggedMembers;
 				if (messagePhrases[2].equals("all")) {
 					System.out.println("Removing all " + moduleName + " games");
-					channel.sendMessage("All " + moduleName + " games have been removed").queue();
+					MessageSender.sendMessage(event, "All " + moduleName + " games have been removed");
 					tttGames = new ArrayList<>();
 					dataSaver.queueSaving();
 				}
@@ -160,10 +157,10 @@ public class TicTacToeUpdater extends Updater {
 					for (Member member : taggedMembers) {
 						if (removePlayerBoard(member.getUser())) {
 							System.out.println("Removing " + member.getEffectiveName() + "'s " + moduleName + " game");
-							channel.sendMessage("<@" + member.getIdLong() + ">'s " + moduleName + " game has been removed").queue();
+							MessageSender.sendMessage(event, "<@" + member.getIdLong() + ">'s " + moduleName + " game has been removed");
 						}
 						else
-							channel.sendMessage("No board found for <@" + member.getIdLong() + ">").queue();
+							MessageSender.sendMessage(event, "No board found for <@" + member.getIdLong() + ">");
 					}
 				}
 			}
@@ -171,12 +168,12 @@ public class TicTacToeUpdater extends Updater {
 			else if (messagePhrases.length >= 3 && messagePhrases[1].equals("save")) {
 				if (messagePhrases[2].equals("disable")) {
 					System.out.println("Saving disabled");
-					channel.sendMessage("Saving disabled").queue();
+					MessageSender.sendMessage(event, "Saving disabled");
 					dataSaver.disableSaving();
 				}
 				else if (messagePhrases[2].equals("enable")) {
 					System.out.println("Saving enabled");
-					channel.sendMessage("Saving enabled").queue();
+					MessageSender.sendMessage(event, "Saving enabled");
 					enableSaving();
 				}
 			}
@@ -186,8 +183,8 @@ public class TicTacToeUpdater extends Updater {
 	// creates DataSaver
 	public void createDataSaver() {
 		tttGames = new ArrayList<>();
-		dataSaver = new DataSaver(moduleName, moduleDataPath, tttGames);
-		tttGames = (ArrayList<TicTacToe>) dataSaver.onStart();
+		dataSaver = new DataSaver<>(moduleName, moduleDataPath, tttGames);
+		tttGames = dataSaver.onStart();
 		if (tttGames == null)
 			tttGames = new ArrayList<>();
 		System.out.println("Loaded " + tttGames.size() + " " + moduleName +  " games");

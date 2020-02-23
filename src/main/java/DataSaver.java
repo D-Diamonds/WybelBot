@@ -1,10 +1,9 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class DataSaver {
+public class DataSaver<Object> {
 
 	private String moduleName;
 	private String moduleDataPath;
@@ -21,6 +20,7 @@ public class DataSaver {
 		enableSaving();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object onStart() {
 		try {
 			System.out.println("\nNow loading " + BotRunner.getBotName() + " " + moduleName + " data...");
@@ -39,7 +39,7 @@ public class DataSaver {
 			}
 			FileInputStream fileInputStream = new FileInputStream(moduleDataPath);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-			dataPointer = objectInputStream.readObject();
+			dataPointer = (Object) objectInputStream.readObject();
 			System.out.println("Completed loading " + BotRunner.getBotName() + " " + moduleName + " data!\n");
 			return dataPointer;
 		}
