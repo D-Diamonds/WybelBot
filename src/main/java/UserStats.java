@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class UserStats implements Serializable {
+	private final static long serialVersionUID = 101L;
 
 	private String playerName;
 

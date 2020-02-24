@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class TicTacToe implements Serializable {
+	private final static long serialVersionUID = 102L;
 
 	private String playerName;
 	private String playerID;
