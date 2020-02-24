@@ -66,8 +66,10 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 			String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
 
 			UserStats userStats;
-			if (getUserStats(author) == null)
+			if (getUserStats(author) == null) {
 				createUserStat(author);
+				dataSaver.queueSaving();
+			}
 			userStats = getUserStats(author);
 
 			if (messagePhrases[0].equals(moduleCommand)) {
