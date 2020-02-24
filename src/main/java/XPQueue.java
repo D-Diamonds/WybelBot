@@ -1,4 +1,5 @@
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,21 +7,21 @@ import java.util.HashMap;
 
 public class XPQueue {
 
-	private HashMap<User, ArrayList<String>> xpQueue = new HashMap<>();
+	private HashMap<MessageReceivedEvent, ArrayList<String>> xpQueue = new HashMap<>();
 
 	public XPQueue() {
 	}
 
-	public void addToQueue(User user, String type) {
-		if (xpQueue.get(user) != null) {
-			ArrayList<String> userQueue = xpQueue.get(user);
+	public void addToQueue(MessageReceivedEvent event, String type) {
+		if (xpQueue.get(event) != null) {
+			ArrayList<String> userQueue = xpQueue.get(event);
 			userQueue.add(type);
 		}
 		else
-			xpQueue.put(user, new ArrayList<>(Collections.singletonList(type)));
+			xpQueue.put(event, new ArrayList<>(Collections.singletonList(type)));
 	}
 
-	public HashMap<User, ArrayList<String>> getXpQueue() {
+	public HashMap<MessageReceivedEvent, ArrayList<String>> getXpQueue() {
 		return xpQueue;
 	}
 

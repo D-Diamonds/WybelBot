@@ -27,7 +27,6 @@ public class UserStats implements Serializable {
 	private static final Map<String, Integer> XP_VALUES;
 	static {
 		HashMap<String, Integer> temp = new HashMap<>();
-		temp.put("message", 1);
 		temp.put("ttt_win", 10);
 		temp.put("ttt_tie", 3);
 		temp.put("ttt_loss", 0);
@@ -41,6 +40,12 @@ public class UserStats implements Serializable {
 	public UserStats(User user) {
 		playerName = user.getName();
 		reset();
+	}
+
+	public void forceLvlUp() {
+		xp += (getLevelXP() - xp);
+		if (checkLvlUp())
+			levelUp();
 	}
 
 	private void reset() {

@@ -89,14 +89,14 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 				}
 				else if (board.playMove(messagePhrases[2].toLowerCase())) {
 					if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":x:")) {
-						BotRunner.getXpQueue().addToQueue(author, "ttt_win");
+						BotRunner.getXpQueue().addToQueue(event, "ttt_win");
 						board.setGameResult("ttt_win");
 						MessageSender.sendMessage(event, board.toEmbed());
 						MessageSender.sendMessage(event, "<@" + author.getId() + "> has won " + moduleName + "!");
 						removePlayerBoard(author);
 					}
 					else if (!board.movesLeft()) {
-						BotRunner.getXpQueue().addToQueue(author, "ttt_tie");
+						BotRunner.getXpQueue().addToQueue(event, "ttt_tie");
 						board.setGameResult("ttt_tie");
 						MessageSender.sendMessage(event, board.toEmbed());
 						MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!");
@@ -105,14 +105,14 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 					else {
 						board.moveAI();
 						if (board.checkWin(board.getMoveRow(), board.getMoveCol(), ":o:")) {
-							BotRunner.getXpQueue().addToQueue(author, "ttt_loss");
+							BotRunner.getXpQueue().addToQueue(event, "ttt_loss");
 							board.setGameResult("ttt_loss");
 							MessageSender.sendMessage(event, board.toEmbed());
 							MessageSender.sendMessage(event, BotRunner.getBotName() + " has won " + moduleName + " against <@" + author.getId() + ">");
 							removePlayerBoard(author);
 						}
 						else if (!board.movesLeft()) {
-							BotRunner.getXpQueue().addToQueue(author, "ttt_tie");
+							BotRunner.getXpQueue().addToQueue(event, "ttt_tie");
 							board.setGameResult("ttt_tie");
 							MessageSender.sendMessage(event, board.toEmbed());
 							MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!");

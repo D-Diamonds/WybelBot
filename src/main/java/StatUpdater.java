@@ -5,10 +5,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 
@@ -40,13 +37,24 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 		dataSaver.queueSaving();
 	}
 
-	public void setXpQueue(HashMap<User, ArrayList<String>> xpQueue) {
-		for (Map.Entry<User, ArrayList<String>> entry : xpQueue.entrySet()) {
-			UserStats entryStats = getUserStats(entry.getKey());
+	public void setXpQueue(HashMap<MessageReceivedEvent, ArrayList<String>> xpQueue) {
+		boolean updatingEntries = false;
+		for (Map.Entry<MessageReceivedEvent, ArrayList<String>> entry : xpQueue.entrySet()) {
+			updatingEntries = true;
+			MessageReceivedEvent event = entry.getKey();
+			User author = event.getAuthor();
+			UserStats entryStats = getUserStats(event.getAuthor());
 			for (String type : entry.getValue()) {
 				entryStats.incrementStats(type);
-				System.out.println("Adding " + type + " xp to user " + (entry.getKey()).getName());
+				if (entryStats.isLeveledUp()) {
+					MessageSender.sendMessage(event, "Congrats <@" + author.getId() + "> on level " + entryStats.getLevel() + "!");
+					entryStats.disableLvlUp();
+				}
+				System.out.println("Adding " + type + " xp to user " + author.getName());
 			}
+		}
+		if (updatingEntries) {
+			dataSaver.queueSaving();
 		}
 	}
 
@@ -62,8 +70,6 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 				createUserStat(author);
 			userStats = getUserStats(author);
 
-			userStats.addXP("message");
-
 			if (messagePhrases[0].equals(moduleCommand)) {
 				// help
 				if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
@@ -76,13 +82,17 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 				if (messagePhrases.length >= 2 && messagePhrases[1].equals("get")) {
 					MessageSender.sendMessage(event, userStats.toEmbed());
 				}
+				if (author.getId().equals("221748640236961792") && messagePhrases[1].equals("lvlup")) {
+					userStats.forceLvlUp();
+					System.out.println("Forcing lvl up");
+				}
 			}
 
 			if (userStats.isLeveledUp()) {
 				MessageSender.sendMessage(event, "Congrats <@" + author.getId() + "> on level " + userStats.getLevel() + "!");
 				userStats.disableLvlUp();
+				dataSaver.queueSaving();
 			}
-			dataSaver.queueSaving();
 		}
 	}
 
