@@ -264,7 +264,7 @@ public class TicTacToe implements Serializable {
 	// returns formatted board for discord output
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(playerName + "'s " + TicTacToeUpdater.getModuleName() + " Game");
+		eb.setTitle(playerName + "'s " + TicTacToeUpdater.moduleName + " Game");
 		eb.setColor(new Color(80, 255, 236));
 
 		StringBuilder boardString = new StringBuilder();

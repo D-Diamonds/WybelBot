@@ -9,31 +9,21 @@ import java.util.*;
 
 public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 
-	private Hashtable<String, UserStats> statsTable;
-
-	private static final String moduleName = "Stats";
-	private static final String moduleCommand = "!stats";
-	private static final String moduleDataPath = "src/" + BotRunner.getBotName() + "Data" + moduleName;
+	public static final String moduleName = "Stats";
+	public static final String moduleCommand = "!stats";
+	public static final String moduleDataPath = "src/" + BotRunner.getBotName() + "Data" + moduleName;
 
 	public StatUpdater() {
-		createDataSaver();
-	}
-
-	public static String getModuleCommand() {
-		return moduleCommand;
-	}
-
-	public static String getModuleName() {
-		return moduleName;
+		createDataSaver(new Hashtable<>());
 	}
 
 	// finds player's board from list of ongoing games
 	private UserStats getUserStats(User user) {
-		return statsTable.get(user.getId());
+		return getUpdatingObject().get(user.getId());
 	}
 
 	private void createUserStat(User user) {
-		statsTable.put(user.getId(), new UserStats(user));
+		getUpdatingObject().put(user.getId(), new UserStats(user));
 		dataSaver.queueSaving();
 	}
 
@@ -58,43 +48,45 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 		}
 	}
 
+	private void helpCmd(MessageReceivedEvent event) {
+		EmbedBuilder eb = new EmbedBuilder();
+		eb.setTitle(moduleName + " Commands:");
+		eb.setColor(new Color(80, 255, 236));
+		eb.addField("**Get user stats**", moduleCommand + " get", false);
+		MessageSender.sendMessage(event, eb.build());
+	}
+
 	// Stats message commands
 	public void onMessageReceived(MessageReceivedEvent event) {
-		if (!event.getAuthor().isBot()) {
-			//MessageChannel channel = event.getChannel();
-			User author = event.getAuthor();
-			String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
+		//MessageChannel channel = event.getChannel();
+		User author = event.getAuthor();
+		String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
 
-			UserStats userStats;
-			if (getUserStats(author) == null) {
-				createUserStat(author);
-				dataSaver.queueSaving();
-			}
-			userStats = getUserStats(author);
+		UserStats userStats;
+		if (getUserStats(author) == null) {
+			createUserStat(author);
+			dataSaver.queueSaving();
+		}
+		userStats = getUserStats(author);
 
-			if (messagePhrases[0].equals(moduleCommand)) {
-				// help
-				if (messagePhrases.length >= 2 && messagePhrases[1].equals("help")) {
-					EmbedBuilder eb = new EmbedBuilder();
-					eb.setTitle(moduleName + " Commands:");
-					eb.setColor(new Color(80, 255, 236));
-					eb.addField("**Get user stats**", moduleCommand + " get", false);
-					MessageSender.sendMessage(event, eb.build());
-				}
-				if (messagePhrases.length >= 2 && messagePhrases[1].equals("get")) {
-					MessageSender.sendMessage(event, userStats.toEmbed());
-				}
-				if (author.getId().equals("221748640236961792") && messagePhrases[1].equals("lvlup")) {
-					userStats.forceLvlUp();
-					System.out.println("Forcing lvl up");
-				}
+		if (messagePhrases[0].equals(moduleCommand) && messagePhrases.length >= 2) {
+			// help
+			if (messagePhrases[1].equals("help")) {
+				helpCmd(event);
 			}
+			else if (messagePhrases[1].equals("get")) {
+				MessageSender.sendMessage(event, userStats.toEmbed());
+			}
+			else if (author.getId().equals("221748640236961792") && messagePhrases[1].equals("lvlup")) {
+				userStats.forceLvlUp();
+				System.out.println("Forcing lvl up");
+			}
+		}
 
-			if (userStats.isLeveledUp()) {
-				MessageSender.sendMessage(event, "Congrats <@" + author.getId() + "> on level " + userStats.getLevel() + "!");
-				userStats.disableLvlUp();
-				dataSaver.queueSaving();
-			}
+		if (userStats.isLeveledUp()) {
+			MessageSender.sendMessage(event, "Congrats <@" + author.getId() + "> on level " + userStats.getLevel() + "!");
+			userStats.disableLvlUp();
+			dataSaver.queueSaving();
 		}
 	}
 
@@ -105,21 +97,4 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 			createUserStat(user);
 		}
 	}
-
-	// creates DataSaver
-	public void createDataSaver() {
-		statsTable = new Hashtable<>();
-		dataSaver = new DataSaver<>(moduleName, moduleDataPath, statsTable);
-		statsTable = dataSaver.onStart();
-		if (statsTable == null)
-			statsTable = new Hashtable<>();
-		System.out.println("Loaded " + statsTable.size() + " " + moduleName + " entries");
-	}
-
-	// enables dataSaver saving
-	public void enableSaving() {
-		dataSaver.enableSaving();
-		System.out.println("Saved " + statsTable.size() + " " + moduleName + " entries");
-	}
-
 }

@@ -13,7 +13,7 @@ public class DataSaver<Object> {
 	private ScheduledExecutorService scheduledExecutorService;
 	private boolean saving;
 
-	public DataSaver (String moduleName, String moduleDataPath, Object dataPointer) {
+	public DataSaver (final String moduleName, final String moduleDataPath, Object dataPointer) {
 		this.moduleName = moduleName;
 		this.moduleDataPath = moduleDataPath;
 		this.dataPointer = dataPointer;

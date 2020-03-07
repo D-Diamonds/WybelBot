@@ -11,7 +11,7 @@ import java.util.Map;
 public class UserStats implements Serializable {
 	private final static long serialVersionUID = 101L;
 
-	private String playerName;
+	private User user;
 
 	// base leveling
 	private int level;
@@ -38,7 +38,7 @@ public class UserStats implements Serializable {
 	}
 
 	public UserStats(User user) {
-		playerName = user.getName();
+		this.user = user;
 		reset();
 	}
 
@@ -111,12 +111,12 @@ public class UserStats implements Serializable {
 	// returns formatted board for discord output
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(playerName + "'s " + StatUpdater.getModuleName());
+		eb.setTitle(user.getName() + "'s " + StatUpdater.moduleName);
 		eb.setColor(new Color(25, 255, 133));
 
 		eb.addField("Level:", Integer.toString(level), false);
 		eb.addField("XP:", xp + "/" + getLevelXP(), false);
-		eb.addField(TicTacToeUpdater.getModuleName() + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
+		eb.addField(TicTacToeUpdater.moduleName + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
 
 		return eb.build();
 	}
