@@ -9,12 +9,12 @@ import java.util.List;
 
 public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 
-	public static final String moduleName = "TicTacToe";
-	public static final String moduleCommand = "!ttt";
-	public static final String moduleDataPath = "src/" + BotRunner.getBotName() + "Data" + moduleName;
-
+	public final static String MODULE_NAME = "TicTacToe";
+	public final static String MODULE_COMMAND = "!ttt";
+	public final static String MODULE_DATA_PATH = "src/" + BotRunner.getBotName() + "Data" + MODULE_NAME;;
+	
 	public TicTacToeUpdater() {
-		createDataSaver(new ArrayList<>());
+		createDataSaver(new ArrayList<>(), MODULE_NAME, MODULE_DATA_PATH);
 	}
 
 
@@ -53,7 +53,7 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 
 	private void moveCmd(TicTacToe board, MessageReceivedEvent event, User author, String move) {
 		if (!board.movesLeft()) {
-			MessageSender.sendMessage(event, "No moves remaining in <@" + author.getId() + ">'s " + moduleName + " game");
+			MessageSender.sendMessage(event, "No moves remaining in <@" + author.getId() + ">'s " + MODULE_NAME + " game");
 			removePlayerBoard(author);
 		}
 		else if (board.playMove(move.toLowerCase())) {
@@ -61,14 +61,14 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 				BotRunner.getXpQueue().addToQueue(event, "ttt_win");
 				board.setGameResult("ttt_win");
 				MessageSender.sendMessage(event, board.toEmbed());
-				MessageSender.sendMessage(event, "<@" + author.getId() + "> has won " + moduleName + "!");
+				MessageSender.sendMessage(event, "<@" + author.getId() + "> has won " + MODULE_NAME + "!");
 				removePlayerBoard(author);
 			}
 			else if (!board.movesLeft()) {
 				BotRunner.getXpQueue().addToQueue(event, "ttt_tie");
 				board.setGameResult("ttt_tie");
 				MessageSender.sendMessage(event, board.toEmbed());
-				MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!");
+				MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + MODULE_NAME + " game ended in a tie!");
 				removePlayerBoard(author);
 			}
 			else {
@@ -77,14 +77,14 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 					BotRunner.getXpQueue().addToQueue(event, "ttt_loss");
 					board.setGameResult("ttt_loss");
 					MessageSender.sendMessage(event, board.toEmbed());
-					MessageSender.sendMessage(event, BotRunner.getBotName() + " has won " + moduleName + " against <@" + author.getId() + ">");
+					MessageSender.sendMessage(event, BotRunner.getBotName() + " has won " + MODULE_NAME + " against <@" + author.getId() + ">");
 					removePlayerBoard(author);
 				}
 				else if (!board.movesLeft()) {
 					BotRunner.getXpQueue().addToQueue(event, "ttt_tie");
 					board.setGameResult("ttt_tie");
 					MessageSender.sendMessage(event, board.toEmbed());
-					MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game ended in a tie!");
+					MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + MODULE_NAME + " game ended in a tie!");
 					removePlayerBoard(author);
 				}
 				else {
@@ -94,25 +94,25 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 			}
 		}
 		else
-			MessageSender.sendMessage(event, "<@" + author.getId() + "> Invalid syntax or move. Command syntax: \"" + moduleCommand + " move [number]\"");
+			MessageSender.sendMessage(event, "<@" + author.getId() + "> Invalid syntax or move. Command syntax: \"" + MODULE_COMMAND + " move [number]\"");
 
 	}
 
 	private void helpCmd(MessageReceivedEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(moduleName + " Commands:");
+		eb.setTitle(MODULE_NAME + " Commands:");
 		eb.setColor(new Color(80, 255, 236));
-		eb.addField("**Start a game**", moduleCommand + " start", false);
-		eb.addField("**Make a move**", moduleCommand + " move [#]", false);
-		eb.addField("**Get game board**", moduleCommand + " get", false);
+		eb.addField("**Start a game**", MODULE_COMMAND + " start", false);
+		eb.addField("**Make a move**", MODULE_COMMAND + " move [#]", false);
+		eb.addField("**Get game board**", MODULE_COMMAND + " get", false);
 		MessageSender.sendMessage(event, eb.build());
 	}
 
 	private void removeCmd(String removeType, MessageReceivedEvent event) {
 		List<Member> taggedMembers;
 		if (removeType.equals("all")) {
-			System.out.println("Removing all " + moduleName + " games");
-			MessageSender.sendMessage(event, "All " + moduleName + " games have been removed");
+			System.out.println("Removing all " + MODULE_NAME + " games");
+			MessageSender.sendMessage(event, "All " + MODULE_NAME + " games have been removed");
 			resetUpdatingObject(new ArrayList<>());
 			dataSaver.queueSaving();
 		}
@@ -120,8 +120,8 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 			taggedMembers = event.getMessage().getMentionedMembers();
 			for (Member member : taggedMembers) {
 				if (removePlayerBoard(member.getUser())) {
-					System.out.println("Removing " + member.getEffectiveName() + "'s " + moduleName + " game");
-					MessageSender.sendMessage(event, "<@" + member.getIdLong() + ">'s " + moduleName + " game has been removed");
+					System.out.println("Removing " + member.getEffectiveName() + "'s " + MODULE_NAME + " game");
+					MessageSender.sendMessage(event, "<@" + member.getIdLong() + ">'s " + MODULE_NAME + " game has been removed");
 				}
 				else
 					MessageSender.sendMessage(event, "No board found for <@" + member.getIdLong() + ">");
@@ -169,11 +169,11 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 			// end
 			else if (messagePhrases[1].equals("end")) {
 				removePlayerBoard(author);
-				MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + moduleName + " game has ended");
+				MessageSender.sendMessage(event, "<@" + author.getId() + ">'s " + MODULE_NAME + " game has ended");
 			}
 		}
 		else
-			MessageSender.sendMessage(event, "No board found for <@" + author.getId() + ">. Create one with the command \"" + moduleCommand + " start\"");
+			MessageSender.sendMessage(event, "No board found for <@" + author.getId() + ">. Create one with the command \"" + MODULE_COMMAND + " start\"");
 
 		// admin commands
 

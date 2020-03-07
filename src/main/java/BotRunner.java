@@ -41,9 +41,9 @@ public class BotRunner extends ListenerAdapter {
 		eb.setTitle(botName + " Modules:");
 		eb.setColor(new Color(0, 0, 255));
 		eb.addField("**List help modules**", "!help", false);
-		eb.addField("**List " + TicTacToeUpdater.moduleName + " commands**", TicTacToeUpdater.moduleCommand + " help", false);
-		eb.addField("**List " + StatUpdater.moduleName + " commands**", StatUpdater.moduleCommand + " help", false);
-		eb.addField("**List " + PollUpdater.moduleName + " commands**", PollUpdater.moduleCommand + " help", false);
+		eb.addField("**List " + TicTacToeUpdater.MODULE_NAME + " commands**", TicTacToeUpdater.MODULE_COMMAND + " help", false);
+		eb.addField("**List " + StatUpdater.MODULE_NAME + " commands**", StatUpdater.MODULE_COMMAND + " help", false);
+		eb.addField("**List " + PollUpdater.MODULE_NAME + " commands**", PollUpdater.MODULE_COMMAND + " help", false);
 		MessageSender.sendMessage(event, eb.build());
 	}
 
@@ -59,9 +59,9 @@ public class BotRunner extends ListenerAdapter {
 					helpCmd(event);
 					// tictactoe commands
 				else if (messagePhrases.length >= 2) {
-					if (messagePhrases[0].equals(TicTacToeUpdater.moduleCommand))
+					if (messagePhrases[0].equals(TicTacToeUpdater.MODULE_COMMAND))
 						ticTacToeUpdater.onMessageReceived(event);
-					else if (messagePhrases[0].equals(PollUpdater.moduleCommand))
+					else if (messagePhrases[0].equals(PollUpdater.MODULE_COMMAND))
 						pollUpdater.onMessageReceived(event);
 				}
 				// stat commands/events

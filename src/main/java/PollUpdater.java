@@ -11,19 +11,19 @@ import java.util.Objects;
 
 public class PollUpdater extends Updater<Hashtable<String, ArrayList<Poll>>> {
 
-	public static final String moduleName = "Poll";
-	public static final String moduleCommand = "!stats";
-	public static final String moduleDataPath = "src/" + BotRunner.getBotName() + "Data" + moduleName;
-
+	public final static String MODULE_NAME = "Poll";
+	public final static String MODULE_COMMAND = "!poll";
+	public final static String MODULE_DATA_PATH = "src/" + BotRunner.getBotName() + "Data" + MODULE_NAME;
+	
 	public PollUpdater() {
-		createDataSaver(new Hashtable<>());
+		createDataSaver(new Hashtable<>(), MODULE_NAME, MODULE_DATA_PATH);
 	}
 
 	private void helpCmd(MessageReceivedEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(moduleName + " Commands:");
+		eb.setTitle(MODULE_NAME + " Commands:");
 		eb.setColor(new Color(0, 95, 37));
-		eb.addField("**Creates poll**", moduleCommand + " create", false);
+		eb.addField("**Creates poll**", MODULE_COMMAND + " create", false);
 		MessageSender.sendMessage(event, eb.build());
 	}
 

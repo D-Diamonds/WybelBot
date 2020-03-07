@@ -9,12 +9,12 @@ import java.util.*;
 
 public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 
-	public static final String moduleName = "Stats";
-	public static final String moduleCommand = "!stats";
-	public static final String moduleDataPath = "src/" + BotRunner.getBotName() + "Data" + moduleName;
-
+	public final static String MODULE_NAME = "Stats";
+	public final static String MODULE_COMMAND = "!stats";
+	public final static String MODULE_DATA_PATH = "src/" + BotRunner.getBotName() + "Data" + MODULE_NAME;
+	
 	public StatUpdater() {
-		createDataSaver(new Hashtable<>());
+		createDataSaver(new Hashtable<>(), MODULE_NAME, MODULE_DATA_PATH);
 	}
 
 	// finds player's board from list of ongoing games
@@ -50,9 +50,9 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 
 	private void helpCmd(MessageReceivedEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(moduleName + " Commands:");
+		eb.setTitle(MODULE_NAME + " Commands:");
 		eb.setColor(new Color(80, 255, 236));
-		eb.addField("**Get user stats**", moduleCommand + " get", false);
+		eb.addField("**Get user stats**", MODULE_COMMAND + " get", false);
 		MessageSender.sendMessage(event, eb.build());
 	}
 
@@ -69,7 +69,7 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 		}
 		userStats = getUserStats(author);
 
-		if (messagePhrases[0].equals(moduleCommand) && messagePhrases.length >= 2) {
+		if (messagePhrases[0].equals(MODULE_COMMAND) && messagePhrases.length >= 2) {
 			// help
 			if (messagePhrases[1].equals("help")) {
 				helpCmd(event);

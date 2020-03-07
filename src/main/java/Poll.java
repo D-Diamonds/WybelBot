@@ -7,10 +7,10 @@ import java.util.ArrayList;
 
 public class Poll implements Serializable {
 	private String question;
-	private ArrayList<PollOption> options;
-	private boolean voting;
+	private ArrayList<PollOption> options = new ArrayList<>();
+	private boolean voting = false;
 
-	private ArrayList<String> voters;
+	private ArrayList<String> voters = new ArrayList<>();
 
 	private int pollID;
 	private static int pollCount = 0;
@@ -19,8 +19,6 @@ public class Poll implements Serializable {
 		pollCount++;
 		pollID = pollCount;
 		this.question = question;
-		this.options = new ArrayList<>();
-		voting = false;
 	}
 
 	public int getPollID() {
@@ -42,6 +40,7 @@ public class Poll implements Serializable {
 	public boolean addVote(int optionNum, String userID) {
 		if (voting && !voters.contains(userID)) {
 			options.get(optionNum).increment();
+			voters.add(userID);
 			return true;
 		}
 		return false;

@@ -111,12 +111,12 @@ public class UserStats implements Serializable {
 	// returns formatted board for discord output
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(user.getName() + "'s " + StatUpdater.moduleName);
+		eb.setTitle(user.getName() + "'s " + StatUpdater.MODULE_NAME);
 		eb.setColor(new Color(25, 255, 133));
 
 		eb.addField("Level:", Integer.toString(level), false);
 		eb.addField("XP:", xp + "/" + getLevelXP(), false);
-		eb.addField(TicTacToeUpdater.moduleName + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
+		eb.addField(TicTacToeUpdater.MODULE_NAME + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
 
 		return eb.build();
 	}

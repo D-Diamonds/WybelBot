@@ -7,15 +7,12 @@ public abstract class Updater<Object> {
 
 	private Object updatingObject;
 
-	private static String moduleName;
-	private static String moduleCommand;
-	private static String moduleDataPath;
 
 	public Object getUpdatingObject() {
 		return updatingObject;
 	}
 
-	public void createDataSaver(Object object) {
+	public void createDataSaver(Object object, String moduleName, String moduleDataPath) {
 		dataSaver = new DataSaver<>(moduleName, moduleDataPath, object);
 		updatingObject = dataSaver.onStart();
 	}

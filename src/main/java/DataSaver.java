@@ -83,7 +83,7 @@ public class DataSaver<Object> {
 		}
 	}
 
-	public void unqueueSaving() {
+	private void unqueueSaving() {
 		saving = false;
 		System.out.println("Saving unqueued for module " + moduleName);
 	}
