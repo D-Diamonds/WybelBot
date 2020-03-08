@@ -149,15 +149,17 @@ public class TicTacToeUpdater extends Updater<ArrayList<TicTacToe>> {
 		User author = event.getAuthor();
 		String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
 
+
+		if (messagePhrases[1].equals("help")) {
+			helpCmd(event);
+			return;
+		}
+
 		TicTacToe board = getPlayerBoard(author);
 
 		// normal commands
 
-		// help
-		if (messagePhrases[1].equals("help"))
-			helpCmd(event);
-		// start
-		else if (messagePhrases[1].equals("start"))
+		if (messagePhrases[1].equals("start"))
 			startCmd(board, event, author);
 		else if (board != null) {
 			// move

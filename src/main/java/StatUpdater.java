@@ -68,6 +68,8 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 			dataSaver.queueSaving();
 		}
 		userStats = getUserStats(author);
+		if (userStats.getUsername() == null)
+			userStats.setUsername(author.getName());
 
 		if (messagePhrases[0].equals(MODULE_COMMAND) && messagePhrases.length >= 2) {
 			// help

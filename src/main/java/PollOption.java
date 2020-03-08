@@ -1,6 +1,8 @@
 import java.io.Serializable;
 
 public class PollOption implements Serializable {
+	private final static long serialVersionUID = 104L;
+
 	private String option;
 	private int votes = 0;
 

@@ -1,24 +1,36 @@
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Poll implements Serializable {
+	private final static long serialVersionUID = 103L;
+
 	private String question;
 	private ArrayList<PollOption> options = new ArrayList<>();
 	private boolean voting = false;
+
+	private String pollAuthorID;
+	private String pollAuthorName;
 
 	private ArrayList<String> voters = new ArrayList<>();
 
 	private int pollID;
 	private static int pollCount = 0;
 
-	public Poll(String question) {
-		pollCount++;
+	public Poll(String question, String pollAuthorID, String pollAuthorName) {
 		pollID = pollCount;
+		pollCount++;
+		this.pollAuthorID = pollAuthorID;
+		this.pollAuthorName = pollAuthorName;
 		this.question = question;
+	}
+
+	public String getQuestion() {
+		return question;
 	}
 
 	public int getPollID() {
@@ -46,18 +58,22 @@ public class Poll implements Serializable {
 		return false;
 	}
 
-	public void start() {
-		voting = true;
+	public boolean start(User user) {
+		if (user.getId().equals(pollAuthorID) && options.size() > 0)
+			voting = true;
+		return voting;
 	}
 
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
 		eb.setTitle(question);
 		eb.setColor(new Color(0, 95, 37));
+		int counter = 0;
 		for (PollOption pollOption : options) {
-			eb.addField("", pollOption.getOption(), false);
-			eb.addField("", Integer.toString(pollOption.getVotes()), true);
+			eb.addField("**" + counter + ")** " + pollOption.getOption(), "Votes: " + pollOption.getVotes(), false);
+			counter++;
 		}
+		eb.addField("Voting: " + ((voting) ? "Enabled" : "Disabled"), "Poll created by " + pollAuthorName + " | ID: " + pollID, false);
 
 		return eb.build();
 	}

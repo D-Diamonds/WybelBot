@@ -11,7 +11,7 @@ import java.util.Map;
 public class UserStats implements Serializable {
 	private final static long serialVersionUID = 101L;
 
-	private User user;
+	private String username;
 
 	// base leveling
 	private int level;
@@ -37,8 +37,16 @@ public class UserStats implements Serializable {
 		return XP_VALUES;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public UserStats(User user) {
-		this.user = user;
+		this.username = user.getName();
 		reset();
 	}
 
@@ -111,7 +119,7 @@ public class UserStats implements Serializable {
 	// returns formatted board for discord output
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(user.getName() + "'s " + StatUpdater.MODULE_NAME);
+		eb.setTitle(username + "'s " + StatUpdater.MODULE_NAME);
 		eb.setColor(new Color(25, 255, 133));
 
 		eb.addField("Level:", Integer.toString(level), false);
