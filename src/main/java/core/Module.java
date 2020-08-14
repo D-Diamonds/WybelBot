@@ -26,7 +26,7 @@ public abstract class Module<Object> {
 
     protected final Map<String[], Command> commands = new LinkedHashMap<>();
 
-    public DataSaver<Object> dataSaver;
+    protected DataSaver<Object> dataSaver;
 
     private Object updatingObject;
 
@@ -47,6 +47,10 @@ public abstract class Module<Object> {
         updatingObject = dataSaver.onStart();
     }
 
+    public void queueSaving() {
+        dataSaver.queueSaving();
+    }
+
     public void enableSaving() {
         dataSaver.enableSaving();
     }
@@ -60,6 +64,7 @@ public abstract class Module<Object> {
     }
 
     public abstract void onMessageReceived(MessageReceivedEvent event, List<String> phrases);
+
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
     }
 
@@ -69,7 +74,7 @@ public abstract class Module<Object> {
                 return entry.getValue();
             }
         }
-        return new CommandNotFound();
+        return new CommandNotFound(this);
     }
 
     public boolean isModuleCommand(String phrase) {
@@ -86,7 +91,9 @@ public abstract class Module<Object> {
         eb.setColor(color);
 
         for (Command command : commands.values()) {
-            eb.addField(command.getDescription(), command.getHelpMessage(), false);
+            if (!command.getName().equalsIgnoreCase("help")) {
+                eb.addField(command.getDescription(), command.getHelpMessage(), false);
+            }
         }
 
         MessageSender.sendMessage(event, eb.build());

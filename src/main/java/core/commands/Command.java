@@ -1,6 +1,7 @@
 package core.commands;
 
 import core.Module;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -15,7 +16,7 @@ public abstract class Command {
     private final String[] args;
     private final String[] optinalArgs;
 
-    private final Module<?> module;
+    protected final Module<?> module;
 
     private final int minArgs;
 
@@ -31,7 +32,11 @@ public abstract class Command {
         this.args = args;
         this.optinalArgs = optionalArgs;
 
-        this.minArgs = (args != null ? args.length : 0) + (aliases.length > 0 ? 1 : 0);
+        this.minArgs = (args != null ? args.length : 0);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String[] getAliases() {
@@ -61,7 +66,7 @@ public abstract class Command {
         return stringBuilder.toString().stripTrailing();
     }
 
-    public void execute() {
+    public void execute(MessageReceivedEvent event, List<String> arguments) {
 
     }
 

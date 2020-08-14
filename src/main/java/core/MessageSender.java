@@ -10,19 +10,21 @@ import javax.annotation.Nonnull;
 
 public class MessageSender {
 
-	public static void sendMessage(@Nonnull MessageReceivedEvent event, Object message) {
-		MessageChannel channel = event.getChannel();
-		try {
-			if (event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_WRITE))
-				if (message instanceof String)
+    public static void sendMessage(@Nonnull MessageReceivedEvent event, Object message) {
+        MessageChannel channel = event.getChannel();
+        try {
+			if (event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_WRITE)) {
+				if (message instanceof String) {
 					channel.sendMessage((String) message).queue();
-				else if (message instanceof MessageEmbed)
+				} else if (message instanceof MessageEmbed) {
 					channel.sendMessage((MessageEmbed) message).queue();
-			else
-				System.out.println("Cannot send message in guild " + event.getGuild().getName() + " in channel " + channel.getName());
-		} catch (InsufficientPermissionException e) {
-			System.out.println(e.toString());
-			System.out.println("Lack of permission in (guild, channel): " + event.getGuild().getName() + ", " + channel.getName());
-		}
-	}
+				} else {
+					System.out.println("Cannot send message in guild " + event.getGuild().getName() + " in channel " + channel.getName());
+				}
+			}
+        } catch (InsufficientPermissionException e) {
+            System.out.println(e.toString());
+            System.out.println("Lack of permission in (guild, channel): " + event.getGuild().getName() + ", " + channel.getName());
+        }
+    }
 }

@@ -12,6 +12,7 @@ import polls.commands.CommandCreate;
 import polls.commands.CommandEditOption;
 import polls.commands.CommandGet;
 import polls.commands.CommandGetAll;
+import polls.commands.CommandHelp;
 import polls.commands.CommandRemoveOption;
 import polls.commands.CommandStart;
 import polls.commands.CommandVote;
@@ -36,10 +37,11 @@ public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
         registerCommand(new CommandGetAll(this));
         registerCommand(new CommandVote(this));
         registerCommand(new CommandStart(this));
+        registerCommand(new CommandHelp(this));
     }
 
     // finds player's board from list of ongoing games
-    private ArrayList<Poll> getUserPolls(User user) {
+    public ArrayList<Poll> getUserPolls(User user) {
         return getUpdatingObject().get(user.getId());
     }
 
@@ -67,7 +69,7 @@ public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
         MessageSender.sendMessage(event, eb.build());
     }
 
-    private Poll getPoll(ArrayList<Poll> polls, int id) {
+    public Poll getPoll(ArrayList<Poll> polls, int id) {
         for (Poll poll : polls) {
             if (poll.getPollID() == id) {
                 return poll;
@@ -126,26 +128,6 @@ public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
         }
     }
 
-    private void startCmd(ArrayList<Poll> polls, String pollID, MessageReceivedEvent event) {
-        try {
-            User user = event.getAuthor();
-            int pollIDInt = Integer.parseInt(pollID);
-            if (getPoll(polls, pollIDInt) != null) {
-                Poll poll = getPoll(polls, pollIDInt);
-                if (poll != null && poll.start(user)) {
-                    MessageSender.sendMessage(event, poll.toEmbed());
-                    dataSaver.queueSaving();
-                } else {
-                    MessageSender.sendMessage(event, "Invalid.");
-                }
-            } else {
-                MessageSender.sendMessage(event, "polls.Poll not found.");
-            }
-        } catch (NumberFormatException | NullPointerException e) {
-            System.out.println(e.toString());
-        }
-    }
-
     private void voteCmd(ArrayList<Poll> polls, String pollID, String optionNum, MessageReceivedEvent event) {
         try {
             Poll poll = Objects.requireNonNull(getPoll(polls, Integer.parseInt(pollID)));
@@ -181,59 +163,23 @@ public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
 
     public void onMessageReceived(MessageReceivedEvent event, List<String> phrases) {
         int length = phrases.size();
-        if (isModuleCommand(phrases.get(0)))
-        if (length > 1) {
-            Command command = getCommand(phrases.get(1));
-            if (command != null && command.isValidInput(phrases)) {
-                command.execute();
-            }
-        }
+        User author = event.getAuthor();
 
-        if (length > 0) {
+        if (isModuleCommand(phrases.get(0))) {
+            ArrayList<Poll> polls = getUserPolls(author);
 
-        }
-
-        if (phrases.length >= MINIMUM_ARGS) {
-            //MessageChannel channel = event.getChannel();
-            User author = event.getAuthor();
-            String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
-
-            if (messagePhrases[1].equals("help")) {
-                helpCmd(event);
-                return;
-            }
-            ArrayList<Poll> polls = new ArrayList<>();
-            if (getUserPolls(author) == null) {
+            if (polls == null) {
                 getUpdatingObject().put(author.getId(), polls);
-            } else {
-                polls = getUserPolls(author);
             }
 
-            if (messagePhrases[1].equals("start")) {
-                startCmd(polls, messagePhrases[2], event);
-            } else if (messagePhrases[1].equals("get")) {
-                getCmd(polls, messagePhrases[2], event);
-            } else if (messagePhrases[1].equals("getids")) {
-                getidsCmd(event);
-            } else if (messagePhrases.length >= 3) {
-                if (messagePhrases[1].equals("create")) {
-                    createCmd(polls, messagePhrases, event);
-                } else if (messagePhrases.length >= 4) {
-                    if (messagePhrases[1].equals("addopt")) {
-                        addOptCmd(messagePhrases[2], messagePhrases, polls, event);
-                    } else if (messagePhrases[1].equals("removeopt")) {
-                        removeOptCmd(messagePhrases[2], messagePhrases[3], polls, event);
-                    } else if (messagePhrases[1].equals("vote")) {
-                        voteCmd(polls, messagePhrases[2], messagePhrases[3], event);
-                    } else if (messagePhrases.length >= 5) {
-                        if (messagePhrases[1].equals("editopt")) {
-                            editOptCmd(messagePhrases[2], messagePhrases, polls, event);
-                        }
-                    }
-                }
 
+            if (length > 1) {
+                Command command = getCommand(phrases.get(1));
+                List<String> arguments = phrases.subList(2, phrases.size());
+                if (command != null && command.isValidInput(arguments)) {
+                    command.execute(event, arguments);
+                }
             }
         }
     }
-
 }

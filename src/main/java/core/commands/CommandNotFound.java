@@ -1,15 +1,18 @@
 package core.commands;
 
-import core.DefaultModule;
+import core.Module;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.List;
 
 public class CommandNotFound extends Command {
 
-    public CommandNotFound() {
-        super(new DefaultModule(), "not-found", "Command not found", new String[]{}, null);
+    public CommandNotFound(Module<?> module) {
+        super(module, "not-found", "Command not found", new String[]{}, null);
     }
 
     @Override
-    public void execute() {
+    public void execute(MessageReceivedEvent event, List<String> arguments) {
 
     }
 }

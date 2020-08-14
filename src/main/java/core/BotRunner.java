@@ -1,10 +1,8 @@
 package core;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -15,7 +13,6 @@ import ttt.TicTacToeModule;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
-import java.awt.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +71,7 @@ public class BotRunner extends ListenerAdapter {
             if (!moduleName.equals("default")) {
                 module.onGuildMemberJoin(event);
             }
-        };
+        });
     }
 
     public static Module<?> getModule(String moduleName) {

@@ -9,74 +9,75 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Poll implements Serializable {
-	private final static long serialVersionUID = 103L;
+    private final static long serialVersionUID = 103L;
 
-	private final String question;
-	private final ArrayList<PollOption> options = new ArrayList<>();
-	private boolean voting = false;
+    private final String question;
+    private final ArrayList<PollOption> options = new ArrayList<>();
+    private boolean voting = false;
 
-	private final String pollAuthorID;
-	private final String pollAuthorName;
+    private final String pollAuthorID;
+    private final String pollAuthorName;
 
-	private final ArrayList<String> voters = new ArrayList<>();
+    private final ArrayList<String> voters = new ArrayList<>();
 
-	private final int pollID;
-	private static int pollCount = 0;
+    private final int pollID;
+    private static int pollCount = 0;
 
-	public Poll(String question, String pollAuthorID, String pollAuthorName) {
-		pollID = pollCount;
-		pollCount++;
-		this.pollAuthorID = pollAuthorID;
-		this.pollAuthorName = pollAuthorName;
-		this.question = question;
-	}
+    public Poll(String question, String pollAuthorID, String pollAuthorName) {
+        pollID = pollCount;
+        pollCount++;
+        this.pollAuthorID = pollAuthorID;
+        this.pollAuthorName = pollAuthorName;
+        this.question = question;
+    }
 
-	public String getQuestion() {
-		return question;
-	}
+    public String getQuestion() {
+        return question;
+    }
 
-	public int getPollID() {
-		return pollID;
-	}
+    public int getPollID() {
+        return pollID;
+    }
 
-	public void addOption(String option) {
-		options.add(new PollOption(option));
-	}
+    public void addOption(String option) {
+        options.add(new PollOption(option));
+    }
 
-	public void removeOption(int index) {
-		options.remove(index);
-	}
+    public void removeOption(int index) {
+        options.remove(index);
+    }
 
-	public void editOption(String option, int optionNum) {
-		options.set(optionNum, new PollOption(option));
-	}
+    public void editOption(String option, int optionNum) {
+        options.set(optionNum, new PollOption(option));
+    }
 
-	public boolean addVote(int optionNum, String userID) {
-		if (voting && !voters.contains(userID)) {
-			options.get(optionNum).increment();
-			voters.add(userID);
-			return true;
-		}
-		return false;
-	}
+    public boolean addVote(int optionNum, String userID) {
+        if (voting && !voters.contains(userID)) {
+            options.get(optionNum).increment();
+            voters.add(userID);
+            return true;
+        }
+        return false;
+    }
 
-	public boolean start(User user) {
-		if (user.getId().equals(pollAuthorID) && options.size() > 0)
+    public boolean start(User user) {
+		if (user.getId().equals(pollAuthorID) && options.size() > 0) {
 			voting = true;
-		return voting;
-	}
-
-	public MessageEmbed toEmbed() {
-		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(question);
-		eb.setColor(new Color(0, 95, 37));
-		int counter = 0;
-		for (PollOption pollOption : options) {
-			eb.addField("**" + counter + ")** " + pollOption.getOption(), "Votes: " + pollOption.getVotes(), false);
-			counter++;
 		}
-		eb.addField("Voting: " + ((voting) ? "Enabled" : "Disabled"), "polls.Poll created by " + pollAuthorName + " | ID: " + pollID, false);
+        return voting;
+    }
 
-		return eb.build();
-	}
+    public MessageEmbed toEmbed() {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(question);
+        eb.setColor(new Color(0, 95, 37));
+        int counter = 0;
+        for (PollOption pollOption : options) {
+            eb.addField("**" + counter + ")** " + pollOption.getOption(), "Votes: " + pollOption.getVotes(), false);
+            counter++;
+        }
+        eb.addField("Voting: " + ((voting) ? "Enabled" : "Disabled"), "polls.Poll created by " + pollAuthorName + " | ID: " + pollID, false);
+
+        return eb.build();
+    }
 }
