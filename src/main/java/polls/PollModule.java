@@ -1,6 +1,6 @@
 package polls;
 
-import core.Command;
+import core.commands.Command;
 import core.MessageSender;
 import core.Module;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,40 +18,24 @@ import polls.commands.CommandVote;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
 
-    private final Collection<Command> commands = new LinkedList<>();
-
     public PollModule() {
-        super("Poll", "!poll", 2);
+        super("Poll", "!poll", new Color(0, 95, 37));
         createDataSaver(new Hashtable<>(), MODULE_NAME, MODULE_DATA_PATH);
 
-        commands.add(new CommandCreate(this));
-        commands.add(new CommandGet(this));
-        commands.add(new CommandAddOption(this));
-        commands.add(new CommandRemoveOption(this));
-        commands.add(new CommandEditOption(this));
-        commands.add(new CommandGetAll(this));
-        commands.add(new CommandVote(this));
-        commands.add(new CommandStart(this));
-    }
-
-    private void helpCmd(MessageReceivedEvent event) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(MODULE_NAME + " Commands:");
-        eb.setColor(new Color(0, 95, 37));
-
-        for (Command command : commands) {
-            eb.addField(command.getDescription(), command.getHelpMessage(), false);
-        }
-
-        MessageSender.sendMessage(event, eb.build());
+        registerCommand(new CommandCreate(this));
+        registerCommand(new CommandGet(this));
+        registerCommand(new CommandAddOption(this));
+        registerCommand(new CommandRemoveOption(this));
+        registerCommand(new CommandEditOption(this));
+        registerCommand(new CommandGetAll(this));
+        registerCommand(new CommandVote(this));
+        registerCommand(new CommandStart(this));
     }
 
     // finds player's board from list of ongoing games
@@ -195,7 +179,20 @@ public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
         }
     }
 
-    public void onMessageReceived(MessageReceivedEvent event, String... phrases) {
+    public void onMessageReceived(MessageReceivedEvent event, List<String> phrases) {
+        int length = phrases.size();
+        if (isModuleCommand(phrases.get(0)))
+        if (length > 1) {
+            Command command = getCommand(phrases.get(1));
+            if (command != null && command.isValidInput(phrases)) {
+                command.execute();
+            }
+        }
+
+        if (length > 0) {
+
+        }
+
         if (phrases.length >= MINIMUM_ARGS) {
             //MessageChannel channel = event.getChannel();
             User author = event.getAuthor();

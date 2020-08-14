@@ -1,5 +1,6 @@
 package core;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 public abstract class Command {
@@ -13,17 +14,25 @@ public abstract class Command {
 
     private final Module<?> module;
 
+    private final int minArgs;
+
     public Command(Module<?> module, String name, String description, String[] aliases, String[] args) {
         this(module, name, description, aliases, args, null);
     }
 
-    public Command(Module<?> module, String name, String description, String[] aliases, String[] args, String[] optinalArgs) {
+    public Command(Module<?> module, String name, String description, @Nonnull String[] aliases, String[] args, String[] optinalArgs) {
         this.module = module;
         this.name = name;
         this.description = description;
         this.aliases = aliases;
         this.args = args;
         this.optinalArgs = optinalArgs;
+
+        this.minArgs = args.length + aliases.length > 0 ? 1 : 0;
+    }
+
+    public String[] getAliases() {
+        return aliases;
     }
 
     public String getDescription() {
@@ -51,6 +60,10 @@ public abstract class Command {
 
     public void execute() {
 
+    }
+
+    public boolean isValidInput(String... phrases) {
+        return phrases.length >= minArgs;
     }
 
 

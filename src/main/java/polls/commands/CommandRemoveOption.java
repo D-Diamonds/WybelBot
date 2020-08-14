@@ -1,6 +1,6 @@
 package polls.commands;
 
-import core.Command;
+import core.commands.Command;
 import polls.PollModule;
 
 public class CommandRemoveOption extends Command {
