@@ -1,6 +1,10 @@
+package ttt;
+
+import core.BotRunner;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.EmbedBuilder;
+import stats.UserStats;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -9,16 +13,16 @@ import java.util.ArrayList;
 public class TicTacToe implements Serializable {
 	private final static long serialVersionUID = 102L;
 
-	private String playerName;
-	private String playerID;
-	private String[][] board;
+	private final String playerName;
+	private final String playerID;
+	private final String[][] board;
 	private int moveRow;
 	private int moveCol;
 
 	private boolean gameOver;
 	private String gameResult;
 
-	private ArrayList<Integer> possibleMoves;
+	private final ArrayList<Integer> possibleMoves;
 
 	private static final String[] NUM_TO_EMOJI = {":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:"};
 
@@ -264,7 +268,7 @@ public class TicTacToe implements Serializable {
 	// returns formatted board for discord output
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(playerName + "'s " + TicTacToeUpdater.MODULE_NAME + " Game");
+		eb.setTitle(playerName + "'s " + BotRunner.getModule("tictactoe").MODULE_NAME + " Game");
 		eb.setColor(new Color(80, 255, 236));
 
 		StringBuilder boardString = new StringBuilder();

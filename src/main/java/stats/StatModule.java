@@ -1,3 +1,7 @@
+package stats;
+
+import core.MessageSender;
+import core.Module;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -5,16 +9,22 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
-public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
+public class StatModule extends Module<Hashtable<String, UserStats>> {
 
-	public final static String MODULE_NAME = "Stats";
-	public final static String MODULE_COMMAND = "!stats";
-	public final static String MODULE_DATA_PATH = "src/" + BotRunner.getBotName() + "Data" + MODULE_NAME;
-	
-	public StatUpdater() {
+	private final XPQueue XP_QUEUE = new XPQueue();
+
+	public StatModule() {
+		super("Stats", "!stats");
 		createDataSaver(new Hashtable<>(), MODULE_NAME, MODULE_DATA_PATH);
+	}
+
+	public XPQueue getXP_QUEUE() {
+		return XP_QUEUE;
 	}
 
 	// finds player's board from list of ongoing games
@@ -57,7 +67,7 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 	}
 
 	// Stats message commands
-	public void onMessageReceived(MessageReceivedEvent event) {
+	public void onMessageReceived(MessageReceivedEvent event, String... phrases) {
 		//MessageChannel channel = event.getChannel();
 		User author = event.getAuthor();
 		String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
@@ -90,6 +100,9 @@ public class StatUpdater extends Updater<Hashtable<String, UserStats>> {
 			userStats.disableLvlUp();
 			dataSaver.queueSaving();
 		}
+
+		setXpQueue(XP_QUEUE.getXpQueue());
+		XP_QUEUE.clearQueue();
 	}
 
 	// creates stat for users not in database

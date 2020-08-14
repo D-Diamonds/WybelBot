@@ -1,3 +1,5 @@
+package polls;
+
 import java.io.Serializable;
 
 public class PollOption implements Serializable {

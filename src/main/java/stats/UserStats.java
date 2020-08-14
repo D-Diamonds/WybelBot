@@ -1,3 +1,6 @@
+package stats;
+
+import core.BotRunner;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -119,12 +122,12 @@ public class UserStats implements Serializable {
 	// returns formatted board for discord output
 	public MessageEmbed toEmbed() {
 		EmbedBuilder eb = new EmbedBuilder();
-		eb.setTitle(username + "'s " + StatUpdater.MODULE_NAME);
+		eb.setTitle(username + "'s " + BotRunner.getModule("stat").MODULE_NAME);
 		eb.setColor(new Color(25, 255, 133));
 
 		eb.addField("Level:", Integer.toString(level), false);
 		eb.addField("XP:", xp + "/" + getLevelXP(), false);
-		eb.addField(TicTacToeUpdater.MODULE_NAME + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
+		eb.addField(BotRunner.getModule("tictactoe").MODULE_NAME + " W | L | T:", tttWins + " | " + tttLosses + " | " + tttTies, false);
 
 		return eb.build();
 	}

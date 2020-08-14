@@ -1,4 +1,5 @@
-import net.dv8tion.jda.api.entities.User;
+package stats;
+
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.HashMap;
 
 public class XPQueue {
 
-	private HashMap<MessageReceivedEvent, ArrayList<String>> xpQueue = new HashMap<>();
+	private final HashMap<MessageReceivedEvent, ArrayList<String>> xpQueue = new HashMap<>();
 
 	public XPQueue() {
 	}
@@ -26,6 +27,6 @@ public class XPQueue {
 	}
 
 	public void clearQueue() {
-		xpQueue = new HashMap<>();
+		xpQueue.clear();
 	}
 }

@@ -1,6 +1,9 @@
+package polls;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import polls.PollOption;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -73,7 +76,7 @@ public class Poll implements Serializable {
 			eb.addField("**" + counter + ")** " + pollOption.getOption(), "Votes: " + pollOption.getVotes(), false);
 			counter++;
 		}
-		eb.addField("Voting: " + ((voting) ? "Enabled" : "Disabled"), "Poll created by " + pollAuthorName + " | ID: " + pollID, false);
+		eb.addField("Voting: " + ((voting) ? "Enabled" : "Disabled"), "polls.Poll created by " + pollAuthorName + " | ID: " + pollID, false);
 
 		return eb.build();
 	}
