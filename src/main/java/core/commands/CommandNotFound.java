@@ -1,9 +1,11 @@
-package core;
+package core.commands;
+
+import core.DefaultModule;
 
 public class CommandNotFound extends Command {
 
     public CommandNotFound() {
-        super(new EmptyModule(), "not-found", "Command not found", new String[]{}, null, null);
+        super(new DefaultModule(), "not-found", "Command not found", new String[]{}, null);
     }
 
     @Override

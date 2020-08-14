@@ -1,7 +1,10 @@
-package core;
+package core.commands;
+
+import core.Module;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class Command {
 
@@ -20,15 +23,15 @@ public abstract class Command {
         this(module, name, description, aliases, args, null);
     }
 
-    public Command(Module<?> module, String name, String description, @Nonnull String[] aliases, String[] args, String[] optinalArgs) {
+    public Command(Module<?> module, String name, String description, @Nonnull String[] aliases, String[] args, String[] optionalArgs) {
         this.module = module;
         this.name = name;
         this.description = description;
         this.aliases = aliases;
         this.args = args;
-        this.optinalArgs = optinalArgs;
+        this.optinalArgs = optionalArgs;
 
-        this.minArgs = args.length + aliases.length > 0 ? 1 : 0;
+        this.minArgs = (args != null ? args.length : 0) + (aliases.length > 0 ? 1 : 0);
     }
 
     public String[] getAliases() {
@@ -62,8 +65,8 @@ public abstract class Command {
 
     }
 
-    public boolean isValidInput(String... phrases) {
-        return phrases.length >= minArgs;
+    public boolean isValidInput(List<String> phrases) {
+        return phrases.size() >= minArgs;
     }
 
 
