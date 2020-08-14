@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import javax.annotation.Nonnull;
 
-public abstract class MessageSender {
+public class MessageSender {
+
 	public static void sendMessage(@Nonnull MessageReceivedEvent event, Object message) {
 		MessageChannel channel = event.getChannel();
 		try {

@@ -1,37 +1,55 @@
 package polls;
 
+import core.Command;
 import core.MessageSender;
 import core.Module;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import polls.commands.CommandAddOption;
+import polls.commands.CommandCreate;
+import polls.commands.CommandEditOption;
+import polls.commands.CommandGet;
+import polls.commands.CommandGetAll;
+import polls.commands.CommandRemoveOption;
+import polls.commands.CommandStart;
+import polls.commands.CommandVote;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 public class PollModule extends Module<Hashtable<String, ArrayList<Poll>>> {
 
+    private final Collection<Command> commands = new LinkedList<>();
+
     public PollModule() {
         super("Poll", "!poll", 2);
         createDataSaver(new Hashtable<>(), MODULE_NAME, MODULE_DATA_PATH);
+
+        commands.add(new CommandCreate(this));
+        commands.add(new CommandGet(this));
+        commands.add(new CommandAddOption(this));
+        commands.add(new CommandRemoveOption(this));
+        commands.add(new CommandEditOption(this));
+        commands.add(new CommandGetAll(this));
+        commands.add(new CommandVote(this));
+        commands.add(new CommandStart(this));
     }
 
     private void helpCmd(MessageReceivedEvent event) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(MODULE_NAME + " Commands:");
         eb.setColor(new Color(0, 95, 37));
-        eb.addField("**Creates poll**", MODULE_COMMAND + " create [poll]", false);
-        eb.addField("**Gets poll**", MODULE_COMMAND + " get [ID]", false);
-        eb.addField("**Adds a voting option**", MODULE_COMMAND + " addOpt [ID] [Option]", false);
-        eb.addField("**Removes a voting option**", MODULE_COMMAND + " removeOpt [ID] [Option #]", false);
-        eb.addField("**Edits a voting option**", MODULE_COMMAND + " editOpt [ID] [Option #] [New Option]", false);
-        eb.addField("**Gets polls of User/Tagged User**", MODULE_COMMAND + " getIDs <Tagged User>", false);
-        eb.addField("**Votes on poll**", MODULE_COMMAND + " vote [ID] [Option #]", false);
-        eb.addField("**Starts poll voting**", MODULE_COMMAND + " start [ID]", false);
+
+        for (Command command : commands) {
+            eb.addField(command.getDescription(), command.getHelpMessage(), false);
+        }
 
         MessageSender.sendMessage(event, eb.build());
     }

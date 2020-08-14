@@ -56,8 +56,7 @@ public class BotRunner extends ListenerAdapter {
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (!event.getAuthor().isBot()) {
-            Message message = event.getMessage();
-            String[] messagePhrases = message.getContentDisplay().toLowerCase().split(" ");
+            String[] messagePhrases = event.getMessage().getContentDisplay().toLowerCase().split(" ");
 
             if (messagePhrases.length > 0) {
                 if (messagePhrases[0].equals("!help"))
@@ -71,7 +70,6 @@ public class BotRunner extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        super.onGuildMemberJoin(event);
         Member member = event.getMember();
         Guild guild = event.getGuild();
 

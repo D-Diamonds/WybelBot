@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 public class DataSaver<Object> {
 
-	private String moduleName;
-	private String moduleDataPath;
+	private final String moduleName;
+	private final String moduleDataPath;
 
 	private Object dataPointer;
 
@@ -30,7 +30,9 @@ public class DataSaver<Object> {
 			if (!srcFolder.exists()) {
 				srcFolder.mkdir();
 			}
+
 			File dataFile = new File(moduleDataPath);
+
 			if (!dataFile.exists()) {
 				dataFile.createNewFile();
 				FileOutputStream fileOutputStream = new FileOutputStream(moduleDataPath);
@@ -39,6 +41,7 @@ public class DataSaver<Object> {
 				objectOutputStream.close();
 				fileOutputStream.close();
 			}
+
 			FileInputStream fileInputStream = new FileInputStream(moduleDataPath);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 			dataPointer = (Object) objectInputStream.readObject();

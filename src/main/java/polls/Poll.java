@@ -3,7 +3,6 @@ package polls;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import polls.PollOption;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -12,16 +11,16 @@ import java.util.ArrayList;
 public class Poll implements Serializable {
 	private final static long serialVersionUID = 103L;
 
-	private String question;
-	private ArrayList<PollOption> options = new ArrayList<>();
+	private final String question;
+	private final ArrayList<PollOption> options = new ArrayList<>();
 	private boolean voting = false;
 
-	private String pollAuthorID;
-	private String pollAuthorName;
+	private final String pollAuthorID;
+	private final String pollAuthorName;
 
-	private ArrayList<String> voters = new ArrayList<>();
+	private final ArrayList<String> voters = new ArrayList<>();
 
-	private int pollID;
+	private final int pollID;
 	private static int pollCount = 0;
 
 	public Poll(String question, String pollAuthorID, String pollAuthorName) {
